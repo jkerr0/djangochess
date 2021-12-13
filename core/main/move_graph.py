@@ -2,7 +2,6 @@ import chessboard
 import chess_piece
 import itertools
 
-from move import Move
 from typing import Tuple, List
 
 
@@ -11,7 +10,7 @@ class MoveGraph:
         self.graph = MoveGraph.build(board)
 
     @staticmethod
-    def build(board: chessboard.Chessboard) -> dict[chessboard.Position, List[Move]]:
+    def build(board: chessboard.Chessboard) -> dict[chessboard.Position, List[chessboard.Move]]:
         pairs = tuple(map(lambda position: (position, board.get_piece(position)),
                           chessboard.Chessboard.all_positions()))
 
@@ -22,18 +21,18 @@ class MoveGraph:
 
     @staticmethod
     def get_static_moves(board: chessboard.Chessboard,
-                         pair: Tuple[chessboard.Position, chess_piece.StaticChessPiece]) -> List[Move]:
+                         pair: Tuple[chessboard.Position, chess_piece.StaticChessPiece]) -> List[chessboard.Move]:
         start_pos = pair[0]
         piece = pair[1]
         all_end_positions = map(lambda mapper: mapper(start_pos), piece.get_move_mappers())
         valid = filter(lambda position: position.is_valid(), all_end_positions)
         empty = filter(lambda position: board.is_empty(position), valid)
-        moves = map(lambda position: Move(start_pos, position), empty)
+        moves = map(lambda position: chessboard.Move(start_pos, position), empty)
         return list(moves)
 
     @staticmethod
     def get_dynamic_moves(board: chessboard.Chessboard,
-                          pair: Tuple[chessboard.Position, chess_piece.DynamicChessPiece]) -> List[Move]:
+                          pair: Tuple[chessboard.Position, chess_piece.DynamicChessPiece]) -> List[chessboard.Move]:
         start_pos = pair[0]
         piece = pair[1]
         positions = itertools.chain(

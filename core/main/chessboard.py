@@ -1,7 +1,7 @@
 import itertools
 
 from chess_piece import ChessPiece, PieceColor
-from position import Position
+from position import Position, Move
 from chess_pieces import King, Knight, Pawn, Rook, Bishop, Queen
 from typing import List
 
@@ -20,9 +20,9 @@ class Chessboard:
     def is_empty(self, position: Position):
         return self._pieces[position.inx()] is not None
 
-    def move(self, start_pos: Position, end_pos: Position):
-        self._pieces[end_pos.inx()] = self._pieces[start_pos.inx()]
-        self._pieces[start_pos.inx()] = None
+    def move(self, move: Move):
+        self._pieces[move.get_end().inx()] = self._pieces[move.get_start().inx()]
+        self._pieces[move.get_start().inx()] = None
 
     @staticmethod
     def all_positions():
