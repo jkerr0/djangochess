@@ -4,3 +4,4 @@
 
 /.idea
 /.git
+/db.sqlite3
