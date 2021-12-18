@@ -4,13 +4,14 @@ from enum import Enum
 
 
 class PieceColor(Enum):
-    BLACK = -1,
-    WHITE = 1
+    BLACK = "black_piece"
+    WHITE = "white_piece"
 
 
 class ChessPiece(ABC):
     def __init__(self, color: PieceColor):
         self.color = color
+        self.code = self.get_code()
 
     def get_color(self) -> PieceColor:
         return self.color

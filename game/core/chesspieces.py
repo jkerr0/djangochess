@@ -1,7 +1,7 @@
 from typing import Callable, List
 
-from position import Position
-from chess_piece import StaticChessPiece, DynamicChessPiece, PieceColor
+from game.core.position import Position
+from game.core.chesspiece import StaticChessPiece, DynamicChessPiece, PieceColor
 
 
 class Knight(StaticChessPiece):
@@ -53,7 +53,7 @@ class Pawn(StaticChessPiece):
         return Position(pos.x(), pos.y() + 2 * self._get_direction()) if pos.y() == self._get_starting_y() else None
 
     def get_code(self) -> str:
-        return ''
+        return 'p'
 
 
 class Bishop(DynamicChessPiece):

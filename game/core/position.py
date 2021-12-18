@@ -2,6 +2,7 @@ class Position:
     def __init__(self, x: int, y: int):
         self._x_coord = x
         self._y_coord = y
+        self.id = self.inx()
 
     @staticmethod
     def from_inx(inx: int):

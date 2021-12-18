@@ -1,9 +1,25 @@
-<table>
-    {% for i in range(0,8) %}
-    <tr>
-        {% for i in range(0,8) %}
-        <td>NaN</td>
-        {% endfor %}
-    </tr>
-    {% endfor %}
-</table>
+<html>
+    <head>
+        {% load static %}
+        <script type="text/javascript" src = "{% static 'game/chessboard.js' %}"></script>
+        <link href = "{% static 'game/chessboard.css' %}" rel="stylesheet" type = "text/css">
+        <title>Django chess</title>
+    </head>
+    <body>
+        <div id = "chessboard" class = "center">
+            <table>
+                {% for board_row in board_rows %}
+                <tr>
+                    {% for field in board_row %}
+                    <td>
+                        <div id = "{{ field.position.id }}" class = "{{ field.color.value }} field">
+                            <div class = "{{ field.piece.color.value }} draggable" draggable="true">{{ field.piece.code }}</div>
+                        </div>
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,23 @@
+.center {
+    margin: auto;
+    width: 50%;
+    padding: 10px;
+}
+
+table, td, tr {
+    border-collapse: collapse;
+}
+
+.white_field {
+    height: 100px;
+    width: 100px;
+    border-collapse: collapse;
+    background-color: gray;
+}
+
+.black_field {
+    height: 100px;
+    width: 100px;
+    border-collapse: collapse;
+    background-color: brown;
+}

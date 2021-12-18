@@ -1,5 +1,5 @@
 import unittest
-from core.main.position import Move
+from game.core.position import Move
 
 
 class MoveTest(unittest.TestCase):
