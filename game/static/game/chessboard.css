@@ -8,16 +8,35 @@ table, td, tr {
     border-collapse: collapse;
 }
 
-.white_field {
+.field {
     height: 100px;
     width: 100px;
     border-collapse: collapse;
-    background-color: gray;
+}
+
+.piece {
+    margin:auto;
+    padding-left: 10px;
+    font-size: 72px;
+    align-content: center;
+}
+
+.white_field {
+    background-color: #dbcdcd;
 }
 
 .black_field {
-    height: 100px;
-    width: 100px;
-    border-collapse: collapse;
-    background-color: brown;
+    background-color: #838383;
+}
+
+.white_piece {
+    color: white;
+}
+
+.black_piece {
+    color: #2d2d2d;
+}
+
+.active {
+    background-color: red;
 }

@@ -12,6 +12,7 @@ class ChessPiece(ABC):
     def __init__(self, color: PieceColor):
         self.color = color
         self.code = self.get_code()
+        self.symbol = self.get_symbol()
 
     def get_color(self) -> PieceColor:
         return self.color
@@ -22,6 +23,10 @@ class ChessPiece(ABC):
 
     @abstractmethod
     def get_code(self) -> str:
+        pass
+
+    @abstractmethod
+    def get_symbol(self) -> str:
         pass
 
     @abstractmethod

@@ -21,6 +21,9 @@ class Knight(StaticChessPiece):
     def get_code(self) -> str:
         return 'N'
 
+    def get_symbol(self) -> str:
+        return "\u2658"
+
 
 class King(StaticChessPiece):
     def get_move_mappers(self) -> List[Callable]:
@@ -32,6 +35,9 @@ class King(StaticChessPiece):
 
     def get_code(self) -> str:
         return 'K'
+
+    def get_symbol(self) -> str:
+        return "\u2654"
 
 
 class Pawn(StaticChessPiece):
@@ -55,6 +61,9 @@ class Pawn(StaticChessPiece):
     def get_code(self) -> str:
         return 'p'
 
+    def get_symbol(self) -> str:
+        return "\u2659"
+
 
 class Bishop(DynamicChessPiece):
     _slopes = [(1, 1), (1, -1), (-1, -1), (-1, 1)]
@@ -65,6 +74,9 @@ class Bishop(DynamicChessPiece):
 
     def get_code(self) -> str:
         return 'B'
+
+    def get_symbol(self) -> str:
+        return "\u2657"
 
     @classmethod
     def get_slopes(cls):
@@ -81,6 +93,9 @@ class Rook(DynamicChessPiece):
     def get_code(self) -> str:
         return 'R'
 
+    def get_symbol(self) -> str:
+        return "\u2656"
+
     @classmethod
     def get_slopes(cls):
         return cls._slopes
@@ -93,3 +108,6 @@ class Queen(DynamicChessPiece):
 
     def get_code(self) -> str:
         return 'Q'
+
+    def get_symbol(self) -> str:
+        return "\u2655"

@@ -35,7 +35,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'game'
+    'channels',
+    'game',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +68,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'dchess.wsgi.application'
+
+#Channels
+ASGI_APPLICATION = 'dchess.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -113,7 +117,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    BASE_DIR / "game" / "static",
 ]
 
 STATIC_URL = '/static/'
