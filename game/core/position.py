@@ -42,6 +42,14 @@ class Move:
         end_pos = Position.from_str(code[2:4])
         return Move(start_pos, end_pos)
 
+    @staticmethod
+    def from_indexes(start_inx: int, end_inx: int):
+        return Move(Position.from_inx(start_inx), Position.from_inx(end_inx))
+
+    def as_dict(self):
+        return {'start_pos': self._start_pos.inx(),
+                'end_pos': self._end_pos.inx()}
+
     def get_start(self) -> Position:
         return self._start_pos
 
