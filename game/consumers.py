@@ -24,7 +24,19 @@ class LobbyConsumer(WebsocketConsumer):
         pass
 
     def receive(self, text_data=None, bytes_data=None):
+        text_data_json = json.loads(text_data)
+        play_as = text_data_json['play-as']
+        player_nick = self.scope["user"].username
+
+        white_player_nick = 'wp-nick'
+        black_player_nick = 'bp-nick'
+
+        if play_as == 'black':
+            black_player_nick = player_nick
+        elif play_as == 'white':
+            white_player_nick = player_nick
+
         self.send(text_data=json.dumps({
-            'white_player_nick': 'wp-nick',
-            'black_player_nick': 'bp-nick'
+            'white_player_nick': white_player_nick,
+            'black_player_nick': black_player_nick
         }))

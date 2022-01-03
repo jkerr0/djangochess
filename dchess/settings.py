@@ -54,7 +54,7 @@ ROOT_URLCONF = 'dchess.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [str(BASE_DIR.joinpath('templates'))],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -99,6 +99,9 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+LOGIN_REDIRECT_URL = '/game'
+LOGOUT_REDIRECT_URL = '/game'
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

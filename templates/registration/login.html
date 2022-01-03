@@ -8,17 +8,18 @@
 </head>
 <body>
     <div class = "d-flex justify-content-center">
-        <form>
+        <form method="post">
+            {% csrf_token %}
             <div class = "mb-3">
-                <label for="login" class="form-label">Login:</label>
-                <input id="login" class="form-control" type="text"/>
+                <label for="{{ form.username.id_for_label }}" class="form-label">Login:</label>
+                {{ form.username }}
             </div>
             <div class = "mb-3">
-                <label for="password" class="form-label">Password:</label>
-                <input id="password" class="form-control" type="password"/>
+                <label for="{{ form.password.id_for_label }}" class="form-label">Password:</label>
+                {{ form.password }}
             </div>
             <div>
-                <button type="submit" class = "btn btn-primary">Login</button>
+                <button type="submit" class="btn btn-primary">Login</button>
             </div>
             <div>
                 <a href={% url 'register' %}>New to djangochess? - Register now</a>
