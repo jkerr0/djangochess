@@ -6,7 +6,7 @@ from game.core.chesspiece import ChessPiece, StaticChessPiece, DynamicChessPiece
 from typing import List
 
 
-# move graph of possible next moves
+# make_move graph of possible next moves
 # nodes - positions
 # edges - moves
 class MoveGraph:

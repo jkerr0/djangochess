@@ -21,7 +21,7 @@ class Chessboard:
     def is_empty(self, position: Position):
         return self._pieces[position.inx()] is not None
 
-    def move(self, move: Move):
+    def make_move(self, move: Move):
         self._pieces[move.get_end().inx()] = self._pieces[move.get_start().inx()]
         self._pieces[move.get_start().inx()] = None
 
@@ -58,3 +58,11 @@ class Chessboard:
     @staticmethod
     def _new_pawn_line(color: PieceColor) -> List[Pawn]:
         return [Pawn(color)] * 8
+
+    @staticmethod
+    def from_moves_list(moves: List[Move]):
+        chessboard = Chessboard()
+        for move in moves:
+            chessboard.make_move(move)
+
+        return chessboard

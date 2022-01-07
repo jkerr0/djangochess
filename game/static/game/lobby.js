@@ -1,5 +1,5 @@
 const gameId = JSON.parse(document.getElementById('game-id').textContent);
-
+document.getElementById('id_game_id').value = gameId;
 const lobbySocket = new WebSocket(
     'ws://'
     + window.location.host
@@ -10,8 +10,8 @@ const lobbySocket = new WebSocket(
 
 lobbySocket.onmessage = e => {
     const data = JSON.parse(e.data);
-    document.getElementById('white_nickname').innerText = data.white_player_nick;
-    document.getElementById('black_nickname').innerText = data.black_player_nick;
+    document.getElementById('id_white_player_name').value = data.setup.white_player_nick;
+    document.getElementById('id_black_player_name').value = data.setup.black_player_nick;
 }
 
 lobbySocket.onclose = e => {

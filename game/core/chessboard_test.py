@@ -30,6 +30,12 @@ class ChessboardCase(unittest.TestCase):
         # as black i want king from first row to be in 4th column
         self.assertTrue(isinstance(board.get_rows(cb.PieceColor.BLACK)[0][3].piece, cb.King))
 
+    def test_moving(self):
+        board = cb.Chessboard.from_moves_list([cb.Move.from_str('e2e4')])
+        self.assertTrue(type(board.get_piece(cb.Position.from_str('e4'))) == cb.Pawn)
+        self.assertTrue(board.get_piece(cb.Position.from_str('e2')) is None)
+
+
 
 if __name__ == '__main__':
     unittest.main()
