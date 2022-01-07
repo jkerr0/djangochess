@@ -1,30 +1,33 @@
 {% extends 'game/layout.html' %}
 
 {% block head %}
-{% load static %}
-<link href="{% static 'game/chessboard.css' %}" rel="stylesheet" type="text/css">
+    {% load static %}
+    <link href="{% static 'game/chessboard.css' %}?version=1" rel="stylesheet" type="text/css">
 {% endblock %}
 {% block title %}Djangochess game{% endblock %}
 
 {% block content %}
-<div id="chessboard" class="center">
-    <table>
-        {% for board_row in board_rows %}
-            <tr>
-                {% for field in board_row %}
-                    <td>
-                        <div id="{{ field.position.id }}" class="{{ field.color.value }} field">
-                            {% if field.piece is not None %}
-                                <div class="{{ field.piece.color.value }} piece">{{ field.piece.symbol }}</div>
-                            {% endif %}
-                        </div>
-                    </td>
-                {% endfor %}
-            </tr>
-        {% endfor %}
-    </table>
-</div>
-{{ game_id|json_script:"game-id" }}
-{{ player_color|json_script:"player-color" }}
-<script type="text/javascript" src="{% static 'game/chessboard.js' %}"></script>
+    <div id="chessboard" class="center">
+        <table>
+            {% for board_row in board_rows %}
+                <tr>
+                    {% for field in board_row %}
+                        <td>
+                            <div id="{{ field.position.id }}" class="{{ field.color.value }} field">
+                                {% if field.piece is not None %}
+                                    <div class="{{ field.piece.color.value }} piece">{{ field.piece.symbol }}</div>
+                                {% endif %}
+                            </div>
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {{ game_id|json_script:"game-id" }}
+    {{ player_color|json_script:"player-color" }}
+    <script type="text/javascript" src="{% static 'game/chessboard.js' %}?version=1"></script>
+    <audio>
+        <source id="message-pop" src="{% static 'game/sounds/message-pop.mp3' %}" type="audio/mpeg">
+    </audio>
 {% endblock %}

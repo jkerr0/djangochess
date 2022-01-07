@@ -29,6 +29,14 @@ table, td, tr {
     background-color: #838383;
 }
 
+.highlighted_black_field {
+    background-color: #e3d771;
+}
+
+.highlighted_white_field {
+    background-color: #e3d771;
+}
+
 .white_piece {
     color: white;
 }

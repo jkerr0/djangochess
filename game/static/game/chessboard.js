@@ -42,6 +42,8 @@ const makeMove = (move) => {
     [...endField.children].forEach(child => endField.removeChild(child));
     addPieceToFieldIfPossible(endField, movedPiece);
     [...startField.children].forEach(child => startField.removeChild(child));
+    playMoveSound();
+    highlightMove(move);
 }
 
 playerPieces.forEach(piece => {
@@ -67,6 +69,8 @@ playerPieces.forEach(piece => {
         piece.classList.remove('dragging');
         if (startPos !== endPos) {
             sendMove();
+            playMoveSound();
+            clearHighlightedFields();
         }
     })
 })
@@ -125,7 +129,29 @@ const getFieldsToDropTo = () => {
     return document.querySelectorAll('.field');
 }
 
+const playMoveSound = () => {
+    const audio = new Audio(document.getElementById('message-pop').getAttribute('src'));
+    audio.play();
+}
 
+const highlightMove = (move) => {
+    const startField = document.getElementById(move.start_pos.toString());
+    const endField = document.getElementById(move.end_pos.toString());
+
+    [startField, endField].forEach(field => {
+        ['black_field', 'white_field'].forEach(fieldClass => {
+            field.classList.replace(fieldClass, 'highlighted_' + fieldClass);
+        })
+    })
+}
+
+const clearHighlightedFields = () => {
+    document.querySelectorAll('.field').forEach(field => {
+        ['black_field', 'white_field'].forEach(fieldClass => {
+            field.classList.replace('highlighted_' + fieldClass, fieldClass);
+        })
+    })
+}
 
 
 
