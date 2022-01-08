@@ -1,5 +1,5 @@
 const gameId = JSON.parse(document.getElementById('game-id').textContent);
-document.getElementById('id_game_id').value = gameId;
+
 const lobbySocket = new WebSocket(
     'ws://'
     + window.location.host
@@ -10,8 +10,16 @@ const lobbySocket = new WebSocket(
 
 lobbySocket.onmessage = e => {
     const data = JSON.parse(e.data);
-    document.getElementById('id_white_player_name').value = data.setup.white_player_nick;
-    document.getElementById('id_black_player_name').value = data.setup.black_player_nick;
+    console.log(data);
+
+    if (data.start_game_url != null) {
+        window.location.replace(data.start_game_url);
+    }
+
+    if (data.setup != null) {
+        document.getElementById('white_nickname').textContent = data.setup.white_player_nick;
+        document.getElementById('black_nickname').textContent = data.setup.black_player_nick;
+    }
 }
 
 lobbySocket.onclose = e => {
@@ -21,7 +29,17 @@ lobbySocket.onclose = e => {
 const white = "white", black = "black";
 
 const sendPlayAs = colorName => {
-    lobbySocket.send(JSON.stringify({'play-as': colorName}))
+    lobbySocket.send(JSON.stringify({
+        'play_as': colorName,
+        'start_game': false
+    }))
+}
+
+const sendStartGame = () => {
+    lobbySocket.send(JSON.stringify({
+        'play_as': null,
+        'start_game': true
+    }))
 }
 
 document.getElementById('as-black').addEventListener('click', e => {
@@ -31,3 +49,7 @@ document.getElementById('as-black').addEventListener('click', e => {
 document.getElementById('as-white').addEventListener('click', e => {
     sendPlayAs(white);
 });
+
+document.getElementById('start_game').addEventListener('click', e => {
+    sendStartGame();
+})

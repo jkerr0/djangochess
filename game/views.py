@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect
-from .core.chessboard import Chessboard, PieceColor
-from .core.position import Move
-from .models import Game, PlayerGameMove
-from .forms import LobbyForm
+from .core.chessboard import PieceColor
+from .models import Game
+from .util import get_game_chessboard
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 
@@ -15,17 +14,11 @@ def index(request):
 
 @login_required
 def chessboard(request, game_id):
-    try:
-        game = Game.objects.get(id=int(game_id))
-    except (Game.DoesNotExist, ValueError):
-        raise Http404(f"Game with id {game_id} does not exist")
+    game = get_game_or_404(int(game_id))
+    if game.start_date is None:
+        return redirect('/game/lobby/' + game_id)
 
-    moves = PlayerGameMove.objects.filter(game=game).order_by('index')
-
-    codes_list = list(map(lambda move: move.move_code, moves))
-    moves_list = list(map(lambda move_code: Move.from_str(move_code), codes_list))
-
-    game_chessboard = Chessboard.from_moves_list(moves_list)
+    game_chessboard = get_game_chessboard(int(game_id))
 
     player_color = PieceColor.WHITE
     if request.user == game.black_player:
@@ -39,8 +32,15 @@ def chessboard(request, game_id):
 
 @login_required
 def lobby(request, game_id):
+    game = get_game_or_404(int(game_id))
+    if game.start_date is not None:
+        return redirect('/game/chessboard/' + game_id)
+
+    white_player_nick = game.white_player.username if game.white_player is not None else '-'
+    black_player_nick = game.black_player.username if game.black_player is not None else '-'
     return render(request, 'game/lobby.html', {'game_id': game_id,
-                                               'form': LobbyForm()})
+                                               'white_player_nick': white_player_nick,
+                                               'black_player_nick': black_player_nick})
 
 
 @login_required
@@ -50,17 +50,12 @@ def new_game(request):
     return redirect('lobby/' + str(game.id))
 
 
-@login_required
-def start_game(request, game_id):
-    # TODO get players from lobby and assign them to game
-    game = Game.objects.get(id=int(game_id))
-    game.start_date = datetime.datetime.now()
-
-    if game.created_by_player == request.user:
-        return redirect('/game/chessboard/' + game_id)
-    else:
-        return redirect('/game/lobby/' + game_id)
-
-
 def register(request):
     return render(request, 'game/register.html', None)
+
+
+def get_game_or_404(game_id: int):
+    try:
+        return Game.objects.get(id=int(game_id))
+    except (Game.DoesNotExist, ValueError):
+        raise Http404(f"Game with id {game_id} does not exist")
