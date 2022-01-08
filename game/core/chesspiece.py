@@ -1,4 +1,4 @@
-from typing import Callable, List
+from typing import Callable, List, Optional
 from abc import ABC, abstractmethod
 from enum import Enum
 
@@ -20,6 +20,9 @@ class ChessPiece(ABC):
     @abstractmethod
     def get_move_mappers(self) -> List[Callable]:
         pass
+
+    def get_attack_mappers(self) -> Optional[List[Callable]]:
+        return None
 
     @abstractmethod
     def get_code(self) -> str:

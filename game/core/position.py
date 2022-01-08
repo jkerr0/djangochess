@@ -30,6 +30,9 @@ class Position:
     def __str__(self) -> str:
         return f"{chr(ord('a') + self.x())}{self.y() + 1}"
 
+    def __eq__(self, other):
+        return self.inx() == other.inx()
+
 
 class Move:
     def __init__(self, start_pos: Position, end_pos: Position):
@@ -58,3 +61,6 @@ class Move:
 
     def __str__(self):
         return str(self._start_pos) + str(self._end_pos)
+
+    def __eq__(self, other):
+        return str(self) == str(other)

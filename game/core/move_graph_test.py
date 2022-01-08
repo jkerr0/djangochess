@@ -1,14 +1,27 @@
 import unittest
 
-from game.core import move_graph as mg, chessboard as cb
+from game.core.move_graph import MoveGraph
+from game.core.chessboard import Chessboard, Move, Position
 
 
-class MyTestCase(unittest.TestCase):
+class MoveGraphTestCase(unittest.TestCase):
     def test_knight_at_start(self):
-        chessboard = cb.Chessboard()
-        graph = mg.MoveGraph(chessboard)
-        self.assertTrue(set(graph.get_moves_by_start(cb.Position.from_str('b1'))
-                            == set(*cb.Move.from_str('b1a3'), *cb.Move.from_str('b1c3'))))
+        chessboard = Chessboard()
+        graph = MoveGraph(chessboard)
+        self.assertEqual({'b1a3', 'b1c3'},
+                         {str(move) for move in graph.get_moves_by_start(Position.from_str('b1'))})
+
+    def test_pawn_at_start(self):
+        chessboard = Chessboard()
+        graph = MoveGraph(chessboard)
+        self.assertEqual({'e2e3', 'e2e4'},
+                         {str(move) for move in graph.get_moves_by_start(Position.from_str('e2'))})
+
+    def test_dynamic_moves(self):
+        chessboard = Chessboard.from_moves_list([Move.from_str('e2e4')])
+        graph = MoveGraph(chessboard)
+        self.assertEqual({'f1' + end_code for end_code in ['e2', 'd3', 'c4', 'b5', 'a6']},
+                         {str(move) for move in graph.get_moves_by_start(Position.from_str('f1'))})
 
 
 if __name__ == '__main__':

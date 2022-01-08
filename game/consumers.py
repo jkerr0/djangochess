@@ -1,10 +1,9 @@
 import json
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
-from .core.position import Move
-from .models import PlayerGameMove, Game
+from .models import Game
 from django.contrib.auth.models import User
-from django.db.models import Max
+from .util import *
 
 import datetime
 
@@ -33,27 +32,34 @@ class GameConsumer(WebsocketConsumer):
         move_json = text_data_json['move']
         move = Move.from_indexes(move_json['start_pos'], move_json['end_pos'])
 
+        self.store_move(move)
+        move_graph = get_game_move_graph(int(self.game_id))
+        game_turn = get_game_turn(int(self.game_id)).value
+
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
                 'type': 'move_message',
-                'move': {'start_pos': move.get_start().inx(),
-                         'end_pos': move.get_end().inx()}
+                'move': move.as_dict(),
+                'move_graph': move_graph.as_dict(),
+                'turn': game_turn
             }
         )
-
-        self.store_move(move)
 
     # Receive message from room group
     def move_message(self, event):
         move = event['move']
+        move_graph = event['move_graph']
+        turn = event['turn']
 
         self.send(text_data=json.dumps({
-            'move': move
+            'move': move,
+            'move_graph': move_graph,
+            'turn': turn
         }))
 
     def store_move(self, move: Move):
-        max_game_index = PlayerGameMove.objects.filter(game_id=int(self.game_id)).aggregate(Max('index'))['index__max']
+        max_game_index = get_game_max_move_index(int(self.game_id))
         if max_game_index is None:
             max_game_index = 0
 
@@ -93,15 +99,16 @@ class LobbyConsumer(WebsocketConsumer):
 
         if start_game is True:
             game = self.get_game()
-            game.start_date = datetime.datetime.now()
-            game.save()
-            async_to_sync(self.channel_layer.group_send)(
-                self.room_group_name,
-                {
-                    'type': 'start_game',
-                    'start_game_url': '/game/chessboard/' + self.game_id
-                }
-            )
+            if game.black_player is not None and game.white_player is not None:
+                game.start_date = datetime.datetime.now()
+                game.save()
+                async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name,
+                    {
+                        'type': 'start_game',
+                        'start_game_url': '/game/chessboard/' + self.game_id
+                    }
+                )
         else:
             game = self.update_game_after_request(play_as, player)
             new_setup = {

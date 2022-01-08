@@ -19,7 +19,7 @@ class Chessboard:
         return self._pieces[position.inx()]
 
     def is_empty(self, position: Position):
-        return self._pieces[position.inx()] is not None
+        return self._pieces[position.inx()] is None
 
     def make_move(self, move: Move):
         self._pieces[move.get_end().inx()] = self._pieces[move.get_start().inx()]

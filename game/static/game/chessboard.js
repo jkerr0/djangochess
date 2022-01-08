@@ -11,6 +11,9 @@ const gameSocket = new WebSocket(
 
 gameSocket.onmessage = e => {
     const data = JSON.parse(e.data);
+    moveGraph = data['move_graph'];
+    turn = data['turn'];
+    enableDisableDragging();
     makeMove(data.move)
 };
 
@@ -22,12 +25,24 @@ gameSocket.onclose = e => {
 const playerColor = JSON.parse(document.getElementById('player-color').textContent);
 const playerPieces = document.querySelectorAll('.' + playerColor);
 
-
+// state
 let startPos = null;
 let endPos = null;
+let moveGraph = JSON.parse(document.getElementById('move-graph').textContent);
+let turn = JSON.parse(document.getElementById('turn').textContent);
 
 const sendMove = () => {
     gameSocket.send(JSON.stringify({'move': {'start_pos': startPos, 'end_pos': endPos}}));
+}
+
+const onSelfMove = () => {
+    sendMove();
+    playMoveSound();
+    clearHighlightedFields();
+}
+
+const onEnemyMove = () => {
+    playMoveSound();
 }
 
 const makeMove = (move) => {
@@ -42,8 +57,8 @@ const makeMove = (move) => {
     [...endField.children].forEach(child => endField.removeChild(child));
     addPieceToFieldIfPossible(endField, movedPiece);
     [...startField.children].forEach(child => startField.removeChild(child));
-    playMoveSound();
     highlightMove(move);
+    onEnemyMove();
 }
 
 playerPieces.forEach(piece => {
@@ -52,11 +67,17 @@ playerPieces.forEach(piece => {
     piece.addEventListener('dragstart', e => {
         piece.classList.add('dragging');
         startPos = parseInt(piece.parentElement.id);
+        clearHighlightedFields();
+        highlightPossibleEndPositions();
 
-        getFieldsToDropTo().forEach(field => {
+        document.querySelectorAll('.field').forEach(field => {
             field.addEventListener('dragover', e => {
-                e.preventDefault();
+                if (getFieldsToDropTo().every(dropabble => dropabble !== document.getElementById(field.id))) {
+                    endPos = startPos;
+                    return;
+                }
                 endPos = parseInt(field.id);
+                e.preventDefault();
                 showAllPiecesFromOtherFields(field);
                 hideEnemyPiecesOnField(field, piece);
                 addPieceToFieldIfPossible(field, document.querySelector('.dragging'));
@@ -65,16 +86,36 @@ playerPieces.forEach(piece => {
     });
 
     piece.addEventListener('dragend', e => {
+        clearHighlightedFields();
         removeEnemyPiecesOnField(piece.parentElement, piece);
         piece.classList.remove('dragging');
         if (startPos !== endPos) {
-            sendMove();
-            playMoveSound();
-            clearHighlightedFields();
+            onSelfMove();
         }
     })
-})
+});
 
+const enableDragging = () => {
+    playerPieces.forEach(piece => {
+        piece.setAttribute('draggable', 'true');
+    });
+}
+
+const disableDragging = () => {
+    playerPieces.forEach(piece => {
+        piece.setAttribute('draggable', 'false');
+    })
+}
+
+const enableDisableDragging = () => {
+    if (turn === playerColor) {
+        enableDragging();
+    } else {
+        disableDragging();
+    }
+}
+
+enableDisableDragging();
 
 const hideEnemyPiecesOnField = (field, piece) => {
     [...field.getElementsByClassName(getEnemyPieceClass(piece))].forEach(enemyPiece => {
@@ -125,8 +166,8 @@ const getFriendPieceClass = piece => {
 }
 
 const getFieldsToDropTo = () => {
-    // TODO - find piece moves by startPos in make_move graph
-    return document.querySelectorAll('.field');
+    return [...moveGraph[startPos.toString()].map(endFieldId => document.getElementById(endFieldId.toString())),
+            document.getElementById(startPos.toString())];
 }
 
 const playMoveSound = () => {
@@ -149,6 +190,15 @@ const clearHighlightedFields = () => {
     document.querySelectorAll('.field').forEach(field => {
         ['black_field', 'white_field'].forEach(fieldClass => {
             field.classList.replace('highlighted_' + fieldClass, fieldClass);
+        })
+    })
+}
+
+const highlightPossibleEndPositions = () => {
+    moveGraph[startPos.toString()].forEach(endFieldId => {
+        const field = document.getElementById(endFieldId.toString());
+        ['black_field', 'white_field'].forEach(fieldClass => {
+            field.classList.replace(fieldClass, 'highlighted_' + fieldClass);
         })
     })
 }

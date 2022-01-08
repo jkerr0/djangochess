@@ -44,7 +44,3 @@ table, td, tr {
 .black_piece {
     color: #2d2d2d;
 }
-
-.active {
-    background-color: red;
-}

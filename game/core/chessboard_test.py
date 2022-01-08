@@ -1,12 +1,12 @@
 import unittest
-from game.core import chessboard as cb
+import game.core.chessboard as cb
 
 
 def is_position_of_type(position_str, cl):
     return isinstance(cb.Chessboard().get_piece(cb.Position.from_str(position_str)), cl)
 
 
-class ChessboardCase(unittest.TestCase):
+class ChessboardTestCase(unittest.TestCase):
     def test_white_init(self):
         self.assertTrue(is_position_of_type('a1', cb.Rook))
         self.assertTrue(is_position_of_type('e1', cb.King))
@@ -18,16 +18,16 @@ class ChessboardCase(unittest.TestCase):
 
     def test_get_rows(self):
         board = cb.Chessboard()
-        # as black i want to get white figures in first row on init
+        # as black, I want to get white figures in first row on init
         self.assertTrue(board.get_rows(cb.PieceColor.BLACK)[0][0].piece.get_color() == cb.PieceColor.WHITE)
 
-        # as white i want to get black figures in first row on init
+        # as white, I want to get black figures in first row on init
         self.assertTrue(board.get_rows(cb.PieceColor.WHITE)[0][0].piece.get_color() == cb.PieceColor.BLACK)
 
-        # as white i want king from first row to be in 5th column
+        # as white, I want king from first row to be in 5th column
         self.assertTrue(isinstance(board.get_rows(cb.PieceColor.WHITE)[0][4].piece, cb.King))
 
-        # as black i want king from first row to be in 4th column
+        # as black, I want king from first row to be in 4th column
         self.assertTrue(isinstance(board.get_rows(cb.PieceColor.BLACK)[0][3].piece, cb.King))
 
     def test_moving(self):
@@ -35,6 +35,10 @@ class ChessboardCase(unittest.TestCase):
         self.assertTrue(type(board.get_piece(cb.Position.from_str('e4'))) == cb.Pawn)
         self.assertTrue(board.get_piece(cb.Position.from_str('e2')) is None)
 
+    def test_is_empty(self):
+        board = cb.Chessboard()
+        self.assertTrue(board.is_empty(cb.Position.from_str('e4')))
+        self.assertFalse(board.is_empty(cb.Position.from_str('e2')))
 
 
 if __name__ == '__main__':

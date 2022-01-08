@@ -26,6 +26,8 @@
     </div>
     {{ game_id|json_script:"game-id" }}
     {{ player_color|json_script:"player-color" }}
+    {{ move_graph|json_script:"move-graph" }}
+    {{ turn|json_script:"turn" }}
     <script type="text/javascript" src="{% static 'game/chessboard.js' %}?version=1"></script>
     <audio>
         <source id="message-pop" src="{% static 'game/sounds/message-pop.mp3' %}" type="audio/mpeg">
