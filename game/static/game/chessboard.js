@@ -13,8 +13,12 @@ gameSocket.onmessage = e => {
     const data = JSON.parse(e.data);
     moveGraph = data['move_graph'];
     turn = data['turn'];
+
     enableDisableDragging();
     makeMove(data.move)
+    if (data['promoted_to_piece'] !== null && typeof data['promoted_to_piece'] !== 'undefined') {
+        replacePiece(data.move.end_pos, data['promoted_to_piece']);
+    }
 };
 
 gameSocket.onclose = e => {
@@ -53,6 +57,7 @@ const makeMove = (move) => {
         return;
     }
 
+    clearHighlightedFields();
     const movedPiece = startField.children[0];
     [...endField.children].forEach(child => endField.removeChild(child));
     addPieceToFieldIfPossible(endField, movedPiece);
@@ -65,6 +70,9 @@ playerPieces.forEach(piece => {
     piece.setAttribute('draggable', 'true');
 
     piece.addEventListener('dragstart', e => {
+        if (!isPlayersTurn()) {
+            return;
+        }
         piece.classList.add('dragging');
         startPos = parseInt(piece.parentElement.id);
         clearHighlightedFields();
@@ -108,11 +116,15 @@ const disableDragging = () => {
 }
 
 const enableDisableDragging = () => {
-    if (turn === playerColor) {
+    if (isPlayersTurn()) {
         enableDragging();
     } else {
         disableDragging();
     }
+}
+
+const isPlayersTurn = () => {
+    return turn === playerColor;
 }
 
 enableDisableDragging();
@@ -203,6 +215,7 @@ const highlightPossibleEndPositions = () => {
     })
 }
 
-
-
-
+const replacePiece = (position, newPieceHtml) => {
+    const field = document.getElementById(position.toString());
+    field.innerHTML = newPieceHtml;
+}

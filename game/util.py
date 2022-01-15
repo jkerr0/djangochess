@@ -1,8 +1,9 @@
-from .core.chesspiece import PieceColor
+from .core.chesspiece import PieceColor, ChessPiece
 from .models import PlayerGameMove
 from .core.chessboard import Chessboard, Move
 from .core.move_graph import MoveGraph
 from django.db.models import Max
+from django.template.loader import render_to_string
 
 
 def get_game_chessboard(game_id: int) -> Chessboard:
@@ -26,3 +27,7 @@ def get_game_max_move_index(game_id: int) -> int:
 
 def get_game_turn(game_id: int) -> PieceColor:
     return PieceColor.WHITE if get_game_max_move_index(game_id) % 2 == 0 else PieceColor.BLACK
+
+
+def render_piece(piece: ChessPiece) -> str:
+    return render_to_string('game/piece.html', {'piece': piece})

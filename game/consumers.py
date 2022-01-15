@@ -1,6 +1,8 @@
 import json
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
+
+from .core.chesspieces import Queen
 from .models import Game
 from django.contrib.auth.models import User
 from .util import *
@@ -31,31 +33,42 @@ class GameConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         move_json = text_data_json['move']
         move = Move.from_indexes(move_json['start_pos'], move_json['end_pos'])
+        game_current_turn = get_game_turn(int(self.game_id))
 
-        self.store_move(move)
-        move_graph = get_game_move_graph(int(self.game_id))
-        game_turn = get_game_turn(int(self.game_id)).value
+        if self.player_move_authorized():
+            self.store_move(move)
+            move_graph = get_game_move_graph(int(self.game_id))
+            game_next_turn = get_game_turn(int(self.game_id)).value
+            promoted_to_piece = None
 
-        async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name,
-            {
-                'type': 'move_message',
-                'move': move.as_dict(),
-                'move_graph': move_graph.as_dict(),
-                'turn': game_turn
-            }
-        )
+            if get_game_chessboard(int(self.game_id)).did_last_move_promote():
+                promoted_to_piece = render_piece(Queen(game_current_turn))
+
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'move_message',
+                    'move': move.as_dict(),
+                    'move_graph': move_graph.as_dict(),
+                    'turn': game_next_turn,
+                    'promoted_to_piece': promoted_to_piece
+                }
+            )
+
+    def player_move_authorized(self) -> bool:
+        game = self.get_game()
+        player = self.scope['user']
+        game_current_turn = get_game_turn(int(self.game_id))
+        return game_current_turn == PieceColor.WHITE and game.white_player == player \
+            or game_current_turn == PieceColor.BLACK and game.black_player == player
 
     # Receive message from room group
     def move_message(self, event):
-        move = event['move']
-        move_graph = event['move_graph']
-        turn = event['turn']
-
         self.send(text_data=json.dumps({
-            'move': move,
-            'move_graph': move_graph,
-            'turn': turn
+            'move': event['move'],
+            'move_graph': event['move_graph'],
+            'turn': event['turn'],
+            'promoted_to_piece': event['promoted_to_piece']
         }))
 
     def store_move(self, move: Move):
@@ -69,6 +82,9 @@ class GameConsumer(WebsocketConsumer):
                                  move_code=str(move),
                                  registered_date=datetime.datetime.now())
         db_move.save()
+
+    def get_game(self):
+        return Game.objects.get(id=int(self.game_id))
 
 
 class LobbyConsumer(WebsocketConsumer):
@@ -159,4 +175,3 @@ class LobbyConsumer(WebsocketConsumer):
 
     def get_game(self):
         return Game.objects.get(id=int(self.game_id))
-

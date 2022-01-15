@@ -7,6 +7,10 @@ class PieceColor(Enum):
     BLACK = "black_piece"
     WHITE = "white_piece"
 
+    @classmethod
+    def enemy_color(cls, color):
+        return cls.WHITE if color is cls.BLACK else cls.BLACK
+
 
 class ChessPiece(ABC):
     def __init__(self, color: PieceColor):

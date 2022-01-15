@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Type
 
 from game.core.field import Field
 from game.core.chesspiece import ChessPiece, PieceColor
@@ -14,6 +14,10 @@ class Chessboard:
         self._pieces.extend(([None] * 32))
         self._pieces.extend(Chessboard._new_pawn_line(PieceColor.BLACK))
         self._pieces.extend(Chessboard._new_bottom_line(PieceColor.BLACK))
+        self._last_move_promoted = False
+
+    def did_last_move_promote(self):
+        return self._last_move_promoted
 
     def get_piece(self, position: Position) -> ChessPiece:
         return self._pieces[position.inx()]
@@ -24,6 +28,31 @@ class Chessboard:
     def make_move(self, move: Move):
         self._pieces[move.get_end().inx()] = self._pieces[move.get_start().inx()]
         self._pieces[move.get_start().inx()] = None
+        self._last_move_promoted = False
+        if self.can_promote(move.get_end()):
+            self.promote_to_queen(move.get_end())
+            self._last_move_promoted = True
+
+    def can_promote(self, position: Position) -> bool:
+        piece = self.get_piece(position)
+        return isinstance(piece, Pawn) and ((piece.get_color() == PieceColor.WHITE and position.y() == 7) or
+                                            (piece.get_color() == PieceColor.BLACK and position.y() == 0))
+
+    def promote_to_queen(self, position: Position):
+        current_color = self.get_piece(position).get_color()
+        self._pieces[position.inx()] = Queen(current_color)
+
+    def get_all_pieces_positions(self):
+        return [*self.get_pieces_positions_by_color(PieceColor.WHITE),
+                *self.get_pieces_positions_by_color(PieceColor.BLACK)]
+
+    def get_pieces_positions_by_color(self, color: PieceColor) -> List[Position]:
+        return list(filter(lambda pos: not self.is_empty(pos) and self.get_piece(pos).get_color() is color,
+                           Chessboard.all_positions()))
+
+    def get_pieces_positions_by_type(self, piece_type: Type[ChessPiece]) -> List[Position]:
+        return list(filter(lambda pos: isinstance(self.get_piece(pos), piece_type),
+                           self.get_all_pieces_positions()))
 
     def get_rows(self, perspective: PieceColor) -> List[List[Field]]:
         row_range = range(0, 8) if perspective == PieceColor.BLACK else range(7, -1, -1)

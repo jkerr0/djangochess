@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-from .core.chessboard import PieceColor
 from .models import Game
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
@@ -21,13 +20,15 @@ def chessboard(request, game_id):
     game_chessboard = get_game_chessboard(int(game_id))
     game_move_graph = get_game_move_graph(int(game_id))
 
-    player_color = PieceColor.WHITE
+    player_color = None
     if request.user == game.black_player:
         player_color = PieceColor.BLACK
+    elif request.user == game.white_player:
+        player_color = PieceColor.WHITE
 
     context = {'board_rows': game_chessboard.get_rows(perspective=player_color),
                'game_id': game_id,
-               'player_color': player_color.value,
+               'player_color': player_color.value if player_color is not None else None,
                'move_graph': game_move_graph.as_dict(),
                'turn': get_game_turn(int(game_id)).value}
     return render(request, 'game/chessboard.html', context)
