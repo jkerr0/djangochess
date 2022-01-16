@@ -23,6 +23,11 @@ class MoveGraphTestCase(unittest.TestCase):
         self.assertEqual({'f1' + end_code for end_code in ['e2', 'd3', 'c4', 'b5', 'a6']},
                          {str(move) for move in graph.get_moves_by_start(Position.from_str('f1'))})
 
+    def test_can_pinned_move(self):
+        chessboard = Chessboard.from_moves_list([Move.from_str(code) for code in ['e2e3', 'd7d6', 'd1h5']])
+        graph = MoveGraph(chessboard)
+        self.assertEqual([], [str(move) for move in graph.get_moves_by_start(Position.from_str('f7'))])
+
 
 if __name__ == '__main__':
     unittest.main()

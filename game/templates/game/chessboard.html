@@ -7,6 +7,27 @@
 {% block title %}Djangochess game{% endblock %}
 
 {% block content %}
+    <!-- Game state modal -->
+    <div class="modal fade" id="stateModal" tabindex="-1" role="dialog" aria-labelledby="stateModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Game finished</h5>
+                    <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body justify-content-center">
+                    <h3 id="stateModalLabel"></h3>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <a type="button" href="{% url 'index' %}" class="btn btn-primary">Return to main page</a>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="chessboard" class="center">
         <table>
             {% for board_row in board_rows %}
@@ -28,8 +49,15 @@
     {{ player_color|json_script:"player-color" }}
     {{ move_graph|json_script:"move-graph" }}
     {{ turn|json_script:"turn" }}
+    {{ game_state|json_script:"game-state" }}
     <script type="text/javascript" src="{% static 'game/chessboard.js' %}?version=1"></script>
     <audio>
         <source id="message-pop" src="{% static 'game/sounds/message-pop.mp3' %}" type="audio/mpeg">
+    </audio>
+    <audio>
+        <source id="check-sound" src="{% static 'game/sounds/select-click-or-countdown.mp3' %}" type="audio/mpeg">
+    </audio>
+    <audio>
+        <source id="end-game-sound" src="{% static 'game/sounds/soap-bubble-sound.mp3' %}" type="audio/mpeg">
     </audio>
 {% endblock %}

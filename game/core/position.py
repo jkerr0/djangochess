@@ -1,3 +1,6 @@
+from typing import List
+
+
 class Position:
     def __init__(self, x: int, y: int):
         self._x_coord = x
@@ -24,7 +27,7 @@ class Position:
     def inx(self) -> int:
         return self._x_coord + 8 * self._y_coord
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         return self.x() in range(0, 8) and self.y() in range(0, 8)
 
     def __str__(self) -> str:
@@ -44,6 +47,10 @@ class Move:
         start_pos = Position.from_str(code[0:2])
         end_pos = Position.from_str(code[2:4])
         return Move(start_pos, end_pos)
+
+    @staticmethod
+    def from_str_list(code_list: List[str]):
+        return list(map(Move.from_str, code_list))
 
     @staticmethod
     def from_indexes(start_inx: int, end_inx: int):

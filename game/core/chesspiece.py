@@ -17,6 +17,7 @@ class ChessPiece(ABC):
         self.color = color
         self.code = self.get_code()
         self.symbol = self.get_symbol()
+        self._has_moved = False
 
     def get_color(self) -> PieceColor:
         return self.color
@@ -39,6 +40,12 @@ class ChessPiece(ABC):
     @abstractmethod
     def has_dynamic_possible_moves(self):
         pass
+
+    def mark_moved(self) -> None:
+        self._has_moved = True
+
+    def has_moved(self) -> bool:
+        return self._has_moved
 
 
 # A piece that has constant possible moves

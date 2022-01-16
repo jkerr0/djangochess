@@ -2,8 +2,28 @@
 
 {% block title %}Djangochess{% endblock %}
 
+{% block head %}
+{% endblock %}
+
 {% block content %}
-    <div class="d-flex justify-content-center">
-        <a href={% url 'new_game' %} id="new_game_button" type="button" class="btn btn-primary my-5">New game</a>
-    </div>
+    <section class="h-100">
+        <header class="container h-100">
+            <div class="d-flex align-items-center justify-content-center h-100">
+                <div class="d-flex flex-column">
+                    <div class="jumbotron">
+                        <h1 class="display-4">Welcome to djangochess!</h1>
+                        <p class="lead">Djangochess is an online chess platform with a custom chess engine
+                            implemented using Django, Channels and Bootstrap.</p>
+                        <hr class="my-4">
+                        <p>Give it a try!</p>
+                        <p class="lead">
+                            <a href={% url 'new_game' %} id="new_game_button" type="button"
+                                    class="btn btn-primary p-2">New game
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </section>
 {% endblock %}

@@ -17,8 +17,10 @@ def chessboard(request, game_id):
     if game.start_date is None:
         return redirect('/game/lobby/' + game_id)
 
-    game_chessboard = get_game_chessboard(int(game_id))
-    game_move_graph = get_game_move_graph(int(game_id))
+    full_state_dict = get_game_full_state(int(game_id))
+    game_move_graph = full_state_dict['move_graph']
+    game_state = full_state_dict['game_state']
+    game_chessboard = full_state_dict['chessboard']
 
     player_color = None
     if request.user == game.black_player:
@@ -30,6 +32,7 @@ def chessboard(request, game_id):
                'game_id': game_id,
                'player_color': player_color.value if player_color is not None else None,
                'move_graph': game_move_graph.as_dict(),
+               'game_state': game_state.as_dict(),
                'turn': get_game_turn(int(game_id)).value}
     return render(request, 'game/chessboard.html', context)
 
@@ -40,11 +43,12 @@ def lobby(request, game_id):
     if game.start_date is not None:
         return redirect('/game/chessboard/' + game_id)
 
-    white_player_nick = game.white_player.username if game.white_player is not None else '-'
-    black_player_nick = game.black_player.username if game.black_player is not None else '-'
+    white_player_nick = game.white_player.username if game.white_player is not None else 'Not selected'
+    black_player_nick = game.black_player.username if game.black_player is not None else 'Not selected'
     return render(request, 'game/lobby.html', {'game_id': game_id,
                                                'white_player_nick': white_player_nick,
-                                               'black_player_nick': black_player_nick})
+                                               'black_player_nick': black_player_nick,
+                                               'is_owner': request.user == game.created_by_player})
 
 
 @login_required

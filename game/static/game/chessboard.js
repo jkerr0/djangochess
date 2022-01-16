@@ -12,10 +12,12 @@ const gameSocket = new WebSocket(
 gameSocket.onmessage = e => {
     const data = JSON.parse(e.data);
     moveGraph = data['move_graph'];
-    turn = data['turn'];
+    turn = data['game_state']['turn'];
 
     enableDisableDragging();
-    makeMove(data.move)
+    makeMove(data.move);
+    handleGameState((data['game_state']))
+    handleSpecialMoves(data['special_move_info'], data.move);
     if (data['promoted_to_piece'] !== null && typeof data['promoted_to_piece'] !== 'undefined') {
         replacePiece(data.move.end_pos, data['promoted_to_piece']);
     }
@@ -49,25 +51,30 @@ const onEnemyMove = () => {
     playMoveSound();
 }
 
-const makeMove = (move) => {
+const makeMoveSilent = (move) => {
     const startField = document.getElementById(move.start_pos.toString());
     const endField = document.getElementById(move.end_pos.toString());
 
     if (move.start_pos === startPos && move.end_pos === endPos) {
         return;
     }
-
-    clearHighlightedFields();
     const movedPiece = startField.children[0];
     [...endField.children].forEach(child => endField.removeChild(child));
     addPieceToFieldIfPossible(endField, movedPiece);
     [...startField.children].forEach(child => startField.removeChild(child));
+}
+
+const makeMove = (move) => {
+    makeMoveSilent(move);
+    clearHighlightedFields();
     highlightMove(move);
     onEnemyMove();
 }
 
-playerPieces.forEach(piece => {
-    piece.setAttribute('draggable', 'true');
+
+
+const bindDraggingEvents = (piece) => {
+       piece.setAttribute('draggable', 'true');
 
     piece.addEventListener('dragstart', e => {
         if (!isPlayersTurn()) {
@@ -100,8 +107,10 @@ playerPieces.forEach(piece => {
         if (startPos !== endPos) {
             onSelfMove();
         }
-    })
-});
+    });
+}
+
+playerPieces.forEach(bindDraggingEvents);
 
 const enableDragging = () => {
     playerPieces.forEach(piece => {
@@ -183,7 +192,19 @@ const getFieldsToDropTo = () => {
 }
 
 const playMoveSound = () => {
-    const audio = new Audio(document.getElementById('message-pop').getAttribute('src'));
+    playAudioById('message-pop');
+}
+
+const playCheckSound = () => {
+    playAudioById('check-sound');
+}
+
+const playEndGameSound = () => {
+    playAudioById('end-game-sound');
+}
+
+const playAudioById = (id) => {
+    const audio = new Audio(document.getElementById(id).getAttribute('src'));
     audio.play();
 }
 
@@ -218,4 +239,65 @@ const highlightPossibleEndPositions = () => {
 const replacePiece = (position, newPieceHtml) => {
     const field = document.getElementById(position.toString());
     field.innerHTML = newPieceHtml;
+    [...field.children].forEach(bindDraggingEvents);
 }
+
+const getPosX = (pos) => {
+    return pos % 8;
+}
+
+const getPosY = (pos) => {
+    return Math.floor(pos / 8);
+}
+
+const getPosFromXY = (x, y) => y * 8 + x;
+
+const handleEnpassant = (move) => {
+    let x = getPosX(move.end_pos);
+    let y = getPosY(move.start_pos);
+    document.getElementById(getPosFromXY(x, y).toString()).innerHTML = '';
+}
+
+const handleCastle = (move) => {
+    let start_x = getPosX(move.start_pos);
+    let end_x = getPosX(move.end_pos);
+    let y = getPosY(move.start_pos);
+    let diff = end_x - start_x;
+    let rook_pos, move_to;
+    if (diff < 0) {
+        rook_pos = getPosFromXY(0, y);
+        move_to = getPosFromXY(3, y);
+    } else if (diff > 0) {
+        rook_pos = getPosFromXY(7, y);
+        move_to = getPosFromXY(5, y);
+    }
+    makeMoveSilent({
+        'start_pos': rook_pos,
+        'end_pos': move_to
+    })
+
+}
+
+const handleSpecialMoves = (specialMoveInfo, move) => {
+    if (specialMoveInfo['enpassant']) {
+        handleEnpassant(move);
+    } else if (specialMoveInfo['castled']) {
+        handleCastle(move);
+    }
+}
+
+const handleGameState = (gameState) => {
+    if (gameState['is_checkmate']) {
+        $('#stateModalLabel').html("Checkmate");
+        $('#stateModal').modal();
+        playEndGameSound();
+    } else if (gameState['is_draw']) {
+        $('#stateModalLabel').html("Draw");
+        $('#stateModal').modal();
+        playEndGameSound();
+    } else if (gameState['is_check']) {
+        playCheckSound();
+    }
+}
+
+handleGameState(JSON.parse(document.getElementById('game-state').textContent));

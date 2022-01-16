@@ -1,4 +1,5 @@
 from .core.chesspiece import PieceColor, ChessPiece
+from .core.game_state import GameState
 from .models import PlayerGameMove
 from .core.chessboard import Chessboard, Move
 from .core.move_graph import MoveGraph
@@ -27,6 +28,17 @@ def get_game_max_move_index(game_id: int) -> int:
 
 def get_game_turn(game_id: int) -> PieceColor:
     return PieceColor.WHITE if get_game_max_move_index(game_id) % 2 == 0 else PieceColor.BLACK
+
+
+def get_game_full_state(game_id: int) -> dict:
+    board = get_game_chessboard(game_id)
+    graph = MoveGraph(board)
+    state = GameState(graph, get_game_turn(game_id))
+    return {
+        'chessboard': board,
+        'move_graph': graph,
+        'game_state': state
+    }
 
 
 def render_piece(piece: ChessPiece) -> str:

@@ -7,22 +7,26 @@
             <tbody>
             <tr>
                 <th scope="row">White:</th>
-                <td><span id="white_nickname" class="w-5">{{ white_player_nick }}</span></td>
+                <td><span id="white_nickname" class="w-5 align-center">{{ white_player_nick }}</span></td>
                 <td>
-                    <button id="as-white" type="button" class="btn btn-secondary">Play as white</button>
+                    <button id="as-white" type="button" class="btn btn-outline-secondary">Play as white</button>
                 </td>
             </tr>
             <tr>
                 <th scope="row">Black:</th>
-                <td><span id="black_nickname" class="w-5">{{ black_player_nick }}</span></td>
+                <td><span id="black_nickname" class="w-5 align-self-center">{{ black_player_nick }}</span></td>
                 <td>
-                    <button id="as-black" type="button" class="btn btn-secondary">Play as black</button>
+                    <button id="as-black" type="button" class="btn btn-outline-secondary">Play as black</button>
                 </td>
             </tr>
             </tbody>
         </table>
         <div class="d-flex justify-content-center">
+            {% if is_owner %}
             <button id="start_game" class="btn btn-primary">Start game</button>
+            {% else %}
+            <button class="btn btn-secondary" disabled>Start game</button>
+            {% endif %}
         </div>
     </div>
     {{ game_id|json_script:"game-id" }}

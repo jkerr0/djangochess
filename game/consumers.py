@@ -37,11 +37,15 @@ class GameConsumer(WebsocketConsumer):
 
         if self.player_move_authorized():
             self.store_move(move)
-            move_graph = get_game_move_graph(int(self.game_id))
-            game_next_turn = get_game_turn(int(self.game_id)).value
+            full_state_dict = get_game_full_state(int(self.game_id))
+            move_graph = full_state_dict['move_graph']
+            game_state = full_state_dict['game_state']
+            chessboard = full_state_dict['chessboard']
+
+            special_moves = chessboard.get_special_move_info()
             promoted_to_piece = None
 
-            if get_game_chessboard(int(self.game_id)).did_last_move_promote():
+            if special_moves['promoted']:
                 promoted_to_piece = render_piece(Queen(game_current_turn))
 
             async_to_sync(self.channel_layer.group_send)(
@@ -50,8 +54,9 @@ class GameConsumer(WebsocketConsumer):
                     'type': 'move_message',
                     'move': move.as_dict(),
                     'move_graph': move_graph.as_dict(),
-                    'turn': game_next_turn,
-                    'promoted_to_piece': promoted_to_piece
+                    'promoted_to_piece': promoted_to_piece,
+                    'game_state': game_state.as_dict(),
+                    'special_move_info': special_moves
                 }
             )
 
@@ -60,15 +65,16 @@ class GameConsumer(WebsocketConsumer):
         player = self.scope['user']
         game_current_turn = get_game_turn(int(self.game_id))
         return game_current_turn == PieceColor.WHITE and game.white_player == player \
-            or game_current_turn == PieceColor.BLACK and game.black_player == player
+               or game_current_turn == PieceColor.BLACK and game.black_player == player
 
-    # Receive message from room group
+    # Receive message from layer
     def move_message(self, event):
         self.send(text_data=json.dumps({
             'move': event['move'],
             'move_graph': event['move_graph'],
-            'turn': event['turn'],
-            'promoted_to_piece': event['promoted_to_piece']
+            'promoted_to_piece': event['promoted_to_piece'],
+            'game_state': event['game_state'],
+            'special_move_info': event['special_move_info']
         }))
 
     def store_move(self, move: Move):
@@ -115,7 +121,7 @@ class LobbyConsumer(WebsocketConsumer):
 
         if start_game is True:
             game = self.get_game()
-            if game.black_player is not None and game.white_player is not None:
+            if game.black_player is not None and game.white_player is not None and player == game.created_by_player:
                 game.start_date = datetime.datetime.now()
                 game.save()
                 async_to_sync(self.channel_layer.group_send)(
@@ -130,8 +136,8 @@ class LobbyConsumer(WebsocketConsumer):
             new_setup = {
                 'type': 'new_setup',
                 'setup': {
-                    'white_player_nick': game.white_player.username if game.white_player is not None else '-',
-                    'black_player_nick': game.black_player.username if game.black_player is not None else '-'
+                    'white_player_nick': game.white_player.username if game.white_player is not None else 'Not selected',
+                    'black_player_nick': game.black_player.username if game.black_player is not None else 'Not selected'
                 }
             }
 

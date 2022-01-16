@@ -40,6 +40,10 @@ class ChessboardTestCase(unittest.TestCase):
         self.assertTrue(board.is_empty(cb.Position.from_str('e4')))
         self.assertFalse(board.is_empty(cb.Position.from_str('e2')))
 
+    def test_en_passant(self):
+        board = cb.Chessboard.from_moves_list(cb.Move.from_str_list(['e2e4', 'd7d5', 'e4e5', 'f7f5']))
+        self.assertEqual('e5f6', str(board.get_possible_en_passant_moves().pop()))
+
 
 if __name__ == '__main__':
     unittest.main()
