@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from .models import Game
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
+from django.contrib.auth.forms import UserCreationForm
 
 import datetime
 from .util import *
@@ -59,7 +60,14 @@ def new_game(request):
 
 
 def register(request):
-    return render(request, 'game/register.html', None)
+    form = UserCreationForm()
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/accounts/login')
+
+    return render(request, 'game/register.html', {'form': form})
 
 
 def get_game_or_404(game_id: int):
