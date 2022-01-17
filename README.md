@@ -11,13 +11,14 @@ In order to run this project you need to install python dependencies:
 - channels_redis
 - django-widget-tweaks
 ```
-python -m pip install <package-name>
+$ python -m pip install <package-name>
 ```
 
 Then install docker and run Redis at port 6379:
 ```
 $ docker run -p 6379:6379 -d redis:5
 ```
+**Note:** You need to have Redis launched for the channel layers to work. Otherwise there will be WebSocket errors thrown in the developer console.
 
 Now you can run:
 ```
