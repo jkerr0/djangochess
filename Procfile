@@ -1,1 +1,1 @@
-web: gunicorn dchess.wsqi
+web: gunicorn dchess.wsgi
