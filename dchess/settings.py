@@ -19,12 +19,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qr*mb&3)+h40*12zn7%qje_n6glgv869&i$)arbxe0uj^^zk#4'
+SECRET_KEY = os.environ['SECRET_KEY']
+DATABASE_PASSWORD = os.environ['DB_PASSWORD']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
 ALLOWED_HOSTS = ['djangochess.herokuapp.com']
+
+CSRF_COOKIE_SECURE = True
+
+SESSION_COOKIE_SECURE = True
+
+SECURE_SSL_REDIRECT = True
 
 # Application definition
 
@@ -87,8 +94,12 @@ CHANNEL_LAYERS = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgresql-cubic-01928',
+        'USER': 'gmqehrdlgrzcyn',
+        'PASSWORD': DATABASE_PASSWORD,
+        'HOST': 'ec2-52-51-155-48.eu-west-1.compute.amazonaws.com',
+        'PORT': '5432'
     }
 }
 
